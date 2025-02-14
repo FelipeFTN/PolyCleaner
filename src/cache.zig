@@ -30,17 +30,17 @@ pub fn get_cache_directories(allocator: std.mem.Allocator) !std.ArrayList(libs.S
     return cache_directories;
 }
 
-pub fn delete_cache_directories(cache_dirs: std.ArrayList(libs.String)) std.fs.Dir.DeleteDirError!void {
+pub fn delete_cache_directories(cache_dirs: std.ArrayList(libs.String)) std.fs.Dir.DeleteTreeError!void {
     if (cache_dirs.items.len == 0) {
         std.debug.print("Error creating cache directories: cache_dirs is null\n", .{});
         return;
     }
 
     for (cache_dirs.items) |dir| {
-        const err = std.fs.cwd().deleteTree(dir.data);
-        if (@TypeOf(err) == std.fs.Dir.DeleteDirError) {
-            std.debug.print("Error deleting cache directory: {s}\n", .{dir.data});
-        }
+        std.fs.cwd().deleteTree(dir.data) catch |err| {
+            std.debug.print("Error deleting cache directory: {s} -> {s}\n", .{dir.data, @errorName(err)});
+        };
+
 
         std.debug.print("Deleted cache directory: {s}\n", .{dir.data});
     }
@@ -53,10 +53,9 @@ pub fn create_cache_directories(cache_dirs: std.ArrayList(libs.String)) std.fs.D
     }
 
     for (cache_dirs.items) |dir| {
-        const err = std.fs.cwd().makeDir(dir.data);
-        if (@TypeOf(err) == std.fs.Dir.MakeError) {
-            std.debug.print("Error creating cache directory: {s}\n", .{dir.data});
-        }
+        std.fs.cwd().makeDir(dir.data) catch |err| {
+            std.debug.print("Error creating cache directory: {s} -> {s}\n", .{dir.data, @errorName(err)});
+        };
 
         std.debug.print("Created cache directory: {s}\n", .{dir.data});
     }
