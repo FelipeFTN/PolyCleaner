@@ -17,7 +17,7 @@ pub const String = struct {
         const index = std.mem.indexOf(u8, self.data, old) orelse return self;
 
         // Calculate new size
-        const new_len: usize = @intCast(@as(usize, self.data.len) + @as(usize, new.len) - @as(usize, old.len));
+        const new_len: usize = @intCast(self.data.len + new.len - old.len);
 
         // Allocate new memory
         const new_data = try self.allocator.alloc(u8, new_len);
